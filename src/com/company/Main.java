@@ -43,12 +43,13 @@ public class Main {
             for(int j = 0; j < num; j++)
             {
                 StdDraw.setPenColor((j * 10) % 127 + 128,(j * 7) % 255,(j * 8) % 255);
-                prts[j].move(0.01);
+                prts[j].move(0.1);
                 for(int k = j + 1; k < num; k++)
                 {
                     if(prts[j].isCollide(prts[k]))
                     {
-                        StdOut.println(j + " collide " + k);
+                        if(k == 0 || j == 0)
+                            StdOut.println(j + " collide " + k);
                         prts[j].collide(prts[k]);
                     }
                 }
