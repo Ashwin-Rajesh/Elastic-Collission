@@ -33,21 +33,21 @@ public class particle {
 		for(int i = 0; i < vel.length; i++)
 		{
 			double thisvel = ((2 * that.mass * that.vel[i]) + (mass_diff * this.vel[i]))/mass_sum;
-			double thatvel = -((2 * this.mass * this.vel[i]) - (mass_diff * that.vel[i]))/mass_sum;
+			double thatvel = ((2 * this.mass * this.vel[i]) - (mass_diff * that.vel[i]))/mass_sum;
 			this.vel[i] = thisvel;
 			that.vel[i] = thatvel;
 		}
 		while(this.isCollide(that))
-			that.move(0.25);
+			that.move(0.01);
 	}
 
 	public void move(double dt)
 	{
 		for(int i = 0; i < pos.length; i++)
 		{
-			pos[i] += vel[i] * dt;
 			if (Math.abs(pos[i]) >= 10 - radius)
 				vel[i] *= -1;
+			pos[i] += vel[i] * dt;
 		}
 	}
 

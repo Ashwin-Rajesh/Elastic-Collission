@@ -26,7 +26,8 @@ public class Main {
             vel[0] = ((double) rand.nextInt(10) - 5 )/ 10;
             vel[1] = ((double) rand.nextInt(10) - 5 )/ 10;
             int mass = 10 + rand.nextInt(20)/2;
-            prts[k] = new particle(pos, vel, mass, Math.sqrt(mass)/30);
+            double radius = Math.sqrt(mass)/10;
+            prts[k] = new particle(pos, vel, mass, radius);
             StdOut.println(prts[k].toString());
         }
 
@@ -48,9 +49,12 @@ public class Main {
                 {
                     if(prts[j].isCollide(prts[k]))
                     {
-                        if(k == 0 || j == 0)
-                            StdOut.println(j + " collide " + k);
+                        StdOut.println(j + " collide " + k);
+                        StdOut.println(prts[j].toString());
+                        StdOut.println(prts[k].toString());
                         prts[j].collide(prts[k]);
+                        StdOut.println(prts[j].toString());
+                        StdOut.println(prts[k].toString());
                     }
                 }
                 //StdOut.println("------------------------");
@@ -59,7 +63,7 @@ public class Main {
                 prts[j].draw();
             }
             StdDraw.show();
-            StdDraw.pause(1);
+            StdDraw.pause(0);
         }
     }
 }
