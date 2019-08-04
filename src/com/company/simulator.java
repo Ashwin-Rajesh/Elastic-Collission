@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 
 public class simulator {
@@ -43,7 +43,7 @@ public class simulator {
 				this.bcol = balls[b].getCount();
 				this.timeTo = currTime + balls[a].timeToHit(balls[b]);
 			}
-			StdOut.println(" Collision added : " + this.a + " , " + this.b + " , " + this.w);
+			//StdOut.println(" Collision added : " + this.a + " , " + this.b + " , " + this.w);
 		}
 
 												// Comparison is done on the basis of predicted time
@@ -78,13 +78,15 @@ public class simulator {
 												// Calls the collide() function of one particle.
 		public void collide()
 		{
+			StdOut.print(" Collision b/w " + a);
+
 			if(b == -1) {
-				StdOut.println(" Point " + a + " collide with wall " + w);
+				StdOut.println(", wall " + w);
 				balls[a].collide(walls[w]);
 			}
 			else
 			{
-				StdOut.println(" Point " + a + " collide with point " + b);
+				StdOut.println(", ball " + b);
 				balls[a].collide(balls[b]);
 			}
 		}
@@ -105,7 +107,9 @@ public class simulator {
 			for(int j = 0; j < walls.length; j++)
 			{
 				if(balls[i].timeToHit(walls[j]) != Double.POSITIVE_INFINITY)
+				{
 					cols.insert(new collision(i, j, true, time));
+				}
 			}
 			for(int j = i + 1; j < balls.length; j++)
 			{
@@ -117,27 +121,33 @@ public class simulator {
 		collision firstCol = cols.delMin();
 		nextTime = firstCol.timeTo;
 		cols.insert(firstCol);
+
+		StdOut.println(" ============================");
+		for(collision c : cols)
+		{
+			StdOut.println("a - " + c.a + " , b - " + c.b + " , w - " + c.w + " ,Time : " + c.timeTo);
+		}
+		StdOut.println(" ============================ Initialisation");
+
 	}
 
 	public void proceed(double dt)
 	{
 		if(cols.isEmpty())
 		{
-			StdOut.println(" EMPTY");
 			StdDraw.clear(Color.BLACK);
 			return;
 		}
 
 		if(time + dt >= nextTime)
 		{
-			dt = nextTime - time;
-
 			collision currCol = cols.delMin();
-			if(currCol.timeTo != nextTime)
-				StdOut.println(" Disrepancy! " + currCol.timeTo + " " + nextTime);
-			currCol.collide();
 
-			time += dt;
+			dt = nextTime - time;
+			time = nextTime;
+			move(dt);
+
+			currCol.collide();
 
 			predict(currCol.a);
 
@@ -146,24 +156,20 @@ public class simulator {
 				predict(currCol.b);
 			}
 
-			move(dt);
 			collision nextCol = cols.delMin();
 			while(!nextCol.isValid() && !cols.isEmpty())
 				nextCol = cols.delMin();
 			nextTime = nextCol.timeTo;
+			cols.insert(nextCol);
 
-			StdOut.println("Moved for "+ dt + " units. Times : " + time + " , " + nextTime + "\n Final points :");
-			for(particle p : balls)
-				StdOut.println(p.toString());
+			StdOut.println(" next collision : " + nextCol.a + " " + nextCol.b + " " + nextCol.w +" t : " + nextCol.timeTo);
 			return;
 		}
 		else
 		{
 			time += dt;
 			move(dt);
-			StdOut.println("Moved for "+ dt + " units. Times : " + time + " , " + nextTime + "\n Final points :");
-			for(particle p : balls)
-				StdOut.println(p.toString());
+			//StdOut.println("Moved for "+ dt + " units. Times : " + time + " , " + nextTime);
 		}
 
 	}
@@ -172,11 +178,15 @@ public class simulator {
 	{
 		for(int i = 0; i < balls.length; i++)
 			if(balls[i].timeToHit(balls[a]) != Double.POSITIVE_INFINITY)
+			{
 				cols.insert(new collision(a, i, false, time));
+			}
 
 		for(int i = 0; i < walls.length; i++)
 			if(balls[a].timeToHit(walls[i]) != Double.POSITIVE_INFINITY)
+			{
 				cols.insert(new collision(a, i, true, time));
+			}
 	}
 
 	private void move(double dt)
@@ -187,6 +197,7 @@ public class simulator {
 
 	public void draw()
 	{
+		StdDraw.setPenColor(Color.BLACK);
 		for(wall w : walls)
 			w.draw();
 
@@ -196,7 +207,7 @@ public class simulator {
 
 	public static void main(String[] args)
 	{
-		int num = 1;
+		int num = 100;
 		int w_num = 4;
 		int bx_size = 10;
 
@@ -212,8 +223,8 @@ public class simulator {
 			vel[0] = ((double) rand.nextInt(10) - 5) / 10;
 			vel[1] = ((double) rand.nextInt(10) - 5) / 10;
 			int mass = 10 + rand.nextInt(20) / 2;
-			double radius = Math.sqrt(mass) / 10;
-			prts[k] = new particle(pos, vel, mass, radius);
+			double radius = Math.sqrt(mass) / 30;
+			prts[k] = new particle(pos, vel, mass, radius, new Color((100 * k) % 255, (150 * k) % 255, (220 * k) % 255));
 		}
 
 		StdOut.println("\n" + prts[0].toString());
@@ -236,9 +247,9 @@ public class simulator {
 			sim.draw();
 			StdDraw.show();
 			sim.proceed(0.5);
-			StdDraw.pause(10);
+			StdDraw.pause(20);
 			while(!StdDraw.isMousePressed())
-				StdDraw.pause();
+				StdDraw.pause(0);
 		}
 	}
 }

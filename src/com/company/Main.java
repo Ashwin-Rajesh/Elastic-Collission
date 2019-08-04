@@ -2,6 +2,8 @@ package com.company;
 
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
+
+import java.awt.*;
 import java.util.Random;
 
 public class Main {
@@ -26,8 +28,8 @@ public class Main {
 			vel[0] = ((double) rand.nextInt(10) - 5) / 10;
 			vel[1] = ((double) rand.nextInt(10) - 5) / 10;
 			int mass = 10 + rand.nextInt(20) / 2;
-			double radius = Math.sqrt(mass) / 10;
-			prts[k] = new particle(pos, vel, mass, radius);
+			double radius = Math.sqrt(mass) / 30;
+			prts[k] = new particle(pos, vel, mass, radius, new Color((k * 10) % 127 + 128,(k * 7) % 255,(k * 8) % 255));
 			StdOut.println("Point number " + k + "\n" + prts[k].toString());
 		}
 
@@ -65,7 +67,6 @@ public class Main {
 						StdOut.println(prts[j].toString());
 						//StdOut.println("=========================================");
 					}
-				StdDraw.setPenColor((j * 10) % 127 + 128,(j * 7) % 255,(j * 8) % 255);
 				prts[j].move(0.5);
 				for(int k = j + 1; k < num; k++)
 				{

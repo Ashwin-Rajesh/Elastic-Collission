@@ -3,14 +3,17 @@ package com.company;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.awt.*;
+
 public class particle {
 	private double[] pos;				// Stores position(x, y components in array) of particle
 	private double[] vel;				// Stores velocity(x, y components in array) of particle
 	private double mass;				// Stores mass of particle
 	private double radius;				// Stores radius of particle
 	private int colCount;				// Stores number of collisions
+	private Color color;				// Stores a color that ball will be displayed in
 
-	public particle(double[] pos, double[] vel, double mass, double radius)
+	public particle(double[] pos, double[] vel, double mass, double radius, Color color)
 	{
 		if(pos == null || vel == null)
 			throw new IllegalArgumentException(" Null arguments passed");
@@ -23,6 +26,7 @@ public class particle {
 		this.mass = mass;
 		this.radius = radius;
 		this.colCount = 0;
+		this.color = color;
 	}
 
 	public boolean equals(Object obj)
@@ -40,6 +44,11 @@ public class particle {
 
 	public void collide(particle that)
 	{
+		/*for(int i = 0; i < vel.length; i++)
+			StdOut.println(this.vel[i] + " , " +  that.vel[i]);
+		StdOut.println("Mass : " + this.mass + " : " + that.mass);
+		*/
+		/*
 		int dimension = pos.length;
 		double dv[] = new double[dimension];
 		double dx[] = new double[dimension];
@@ -60,10 +69,20 @@ public class particle {
 		}
 
 		that.colCount++;
-		this.colCount++;
+		this.colCount++;*/
 
-		while(this.isCollide(that))
-			that.move(0.01);
+		double mass_sum = this.mass + that.mass;
+		for(int i = 0; i < vel.length; i++)
+		{
+			double temp_vel = ((2 * that.mass * that.vel[i]) + this.vel[i]*(this.mass - that.mass))/mass_sum;
+			that.vel[i] = ((2 * this.mass * this.vel[i]) + that.vel[i]*(that.mass - this.mass))/mass_sum;
+			this.vel[i] = temp_vel;
+		}
+
+		/*for(int i = 0; i < vel.length; i++)
+			StdOut.println(this.vel[i] + " , " +  that.vel[i]);
+
+		StdOut.println(" collision processed.");*/
 	}
 
 	public void collide(wall that)
@@ -87,8 +106,8 @@ public class particle {
 
 		this.colCount++;
 
-		while(this.isCollide(that))
-			this.move(0.01);
+		/*while(this.isCollide(that))
+			this.move(0.01);*/
 	}
 
 	public void move(double dt)
@@ -105,6 +124,8 @@ public class particle {
 	{
 		if(pos.length > 2)
 			throw new IllegalArgumentException(" Only till 2 dimensions can be drawn as of now.");
+
+		StdDraw.setPenColor(color);
 
 		if(pos.length == 1)
 			StdDraw.filledCircle(pos[0],0, radius);
@@ -123,13 +144,13 @@ public class particle {
 		str.append(" Mass      : " + mass + "\n");
 		str.append(" Radius    : " + radius + "\n");
 		str.append(" Position  : ");
-		for(double p : pos)
-			str.append(p + " , ");
+		for(int i = 0; i < pos.length; i++)
+			str.append(pos[i] + " , ");
 		str.append("\n");
 
 		str.append(" Velocity  : ");
-		for(double v : vel)
-			str.append(v + " , ");
+		for(int i = 0; i < vel.length; i++)
+			str.append(vel[i] + " , ");
 		str.append("\n");
 
 		return str.toString();
@@ -222,10 +243,12 @@ public class particle {
 			disdot += dx * normal[i];
 		}
 
-		if(disdot * veldot >= 0)
+		if(disdot * veldot >= 0) {
 			return Double.POSITIVE_INFINITY;
-		else
-			return -(disdot - radius) / veldot;
+		}
+		else {
+			return Math.abs((Math.abs(disdot) - radius) / veldot);
+		}
 	}
 
 	public boolean isCollide(particle that)
