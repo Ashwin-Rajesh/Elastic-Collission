@@ -79,6 +79,9 @@ public class particle {
 			this.vel[i] = temp_vel;
 		}
 
+		this.colCount++;
+		that.colCount++;
+
 		/*for(int i = 0; i < vel.length; i++)
 			StdOut.println(this.vel[i] + " , " +  that.vel[i]);
 
@@ -217,7 +220,7 @@ public class particle {
 		if(dxdv >= 0)
 			return Double.POSITIVE_INFINITY;
 
-		double d = (dxdv * dxdv) - (dvdv) * (dxdx - (this.radius + that.radius));
+		double d = (dxdv * dxdv) - (dvdv) * (dxdx - Math.pow((this.radius + that.radius), 2));
 
 		if(d < 0)
 			return Double.POSITIVE_INFINITY;
@@ -239,7 +242,7 @@ public class particle {
 		for(int i = 0; i < dimensions; i++)
 		{
 			veldot += vel[i] * normal[i];
-			double dx = pos[i] + point[i];
+			double dx = pos[i] - point[i];
 			disdot += dx * normal[i];
 		}
 

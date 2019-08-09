@@ -14,6 +14,7 @@ public class simulator {
 	private MinPQ<collision> cols;				// This data structure stores data of all collisions, sorted based on time
 	private double time;						// Stores time elapsed since start of simulation
 	private double nextTime;
+	public int num;
 												// This class is used to store data of collisions.
 	private class collision implements Comparable<collision>
 	{
@@ -78,15 +79,11 @@ public class simulator {
 												// Calls the collide() function of one particle.
 		public void collide()
 		{
-			StdOut.print(" Collision b/w " + a);
-
 			if(b == -1) {
-				StdOut.println(", wall " + w);
 				balls[a].collide(walls[w]);
 			}
 			else
 			{
-				StdOut.println(", ball " + b);
 				balls[a].collide(balls[b]);
 			}
 		}
@@ -118,24 +115,33 @@ public class simulator {
 			}
 		}
 
-		collision firstCol = cols.delMin();
-		nextTime = firstCol.timeTo;
-		cols.insert(firstCol);
+		if(!cols.isEmpty()) {
+			collision firstCol = cols.delMin();
+			nextTime = firstCol.timeTo;
+			cols.insert(firstCol);
+		}
+		else
+		{
+			nextTime = Double.POSITIVE_INFINITY;
+		}
 
-		StdOut.println(" ============================");
+		/*StdOut.println(" ============================");
 		for(collision c : cols)
 		{
 			StdOut.println("a - " + c.a + " , b - " + c.b + " , w - " + c.w + " ,Time : " + c.timeTo);
 		}
 		StdOut.println(" ============================ Initialisation");
-
+		 */
 	}
 
 	public void proceed(double dt)
 	{
-		if(cols.isEmpty())
+		if(nextTime == Double.POSITIVE_INFINITY)
 		{
-			StdDraw.clear(Color.BLACK);
+			move(dt);
+			StdDraw.clear();
+			StdOut.println("No more collisions");
+			nextTime = Double.POSITIVE_INFINITY;
 			return;
 		}
 
@@ -143,26 +149,67 @@ public class simulator {
 		{
 			collision currCol = cols.delMin();
 
-			dt = nextTime - time;
+			double new_dt = nextTime - time;
 			time = nextTime;
-			move(dt);
+			move(new_dt);
 
+			num++;
 			currCol.collide();
 
-			predict(currCol.a);
+			for(int i = 0; i < balls.length; i++)
+				if(balls[i].timeToHit(balls[currCol.a]) != Double.POSITIVE_INFINITY)
+				{
+					cols.insert(new collision(currCol.a, i, false, time));
+				}
+
+			for(int i = 0; i < walls.length; i++)
+				if(balls[currCol.a].timeToHit(walls[i]) != Double.POSITIVE_INFINITY)
+				{
+					cols.insert(new collision(currCol.a, i, true, time));
+				}
 
 			if(currCol.b != -1)
 			{
-				predict(currCol.b);
+				for(int i = 0; i < balls.length; i++)
+					if(balls[i].timeToHit(balls[currCol.b]) != Double.POSITIVE_INFINITY && i!= currCol.a)
+					{
+						cols.insert(new collision(currCol.b, i, false, time));
+					}
+
+				for(int i = 0; i < walls.length; i++)
+					if(balls[currCol.b].timeToHit(walls[i]) != Double.POSITIVE_INFINITY)
+					{
+						cols.insert(new collision(currCol.b, i, true, time));
+					}
+
 			}
 
-			collision nextCol = cols.delMin();
-			while(!nextCol.isValid() && !cols.isEmpty())
-				nextCol = cols.delMin();
-			nextTime = nextCol.timeTo;
-			cols.insert(nextCol);
+			if(!cols.isEmpty()) {
+				collision nextCol = cols.delMin();
+				while (!nextCol.isValid() && !cols.isEmpty())
+					nextCol = cols.delMin();
+				nextTime = nextCol.timeTo;
+				cols.insert(nextCol);
+			}
+			else
+			{
+				nextTime = Double.POSITIVE_INFINITY;
+			}
+
+			proceed(dt - new_dt);
+
+			// Remove '/* and */ below to see collisions stored in the Priority Queue.
+			/*
+			StdOut.println(" ============================");
+			for(collision c : cols)
+			{
+				if(c.isValid())
+					StdOut.println("a - " + c.a + " , b - " + c.b + " , w - " + c.w + " ,Time : " + c.timeTo);
+			}
+			StdOut.println(" ============================");
 
 			StdOut.println(" next collision : " + nextCol.a + " " + nextCol.b + " " + nextCol.w +" t : " + nextCol.timeTo);
+			*/
 			return;
 		}
 		else
@@ -172,21 +219,6 @@ public class simulator {
 			//StdOut.println("Moved for "+ dt + " units. Times : " + time + " , " + nextTime);
 		}
 
-	}
-
-	private void predict(int a)
-	{
-		for(int i = 0; i < balls.length; i++)
-			if(balls[i].timeToHit(balls[a]) != Double.POSITIVE_INFINITY)
-			{
-				cols.insert(new collision(a, i, false, time));
-			}
-
-		for(int i = 0; i < walls.length; i++)
-			if(balls[a].timeToHit(walls[i]) != Double.POSITIVE_INFINITY)
-			{
-				cols.insert(new collision(a, i, true, time));
-			}
 	}
 
 	private void move(double dt)
@@ -207,14 +239,22 @@ public class simulator {
 
 	public static void main(String[] args)
 	{
-		int num = 100;
+		int p_num = 100;
 		int w_num = 4;
 		int bx_size = 10;
 
-		particle prts[] = new particle[num];
+		particle prts[] = new particle[p_num];
 		wall wls[] = new wall[w_num];
 
-		for(int k = 0; k < num; k++) {
+		wls[0] = new wall(new double[]{bx_size, 0}, new double[]{1, 0});
+		wls[1] = new wall(new double[]{0, bx_size}, new double[]{0, 1});
+		wls[2] = new wall(new double[]{-bx_size, 0}, new double[]{1, 0});
+		wls[3] = new wall(new double[]{0, -bx_size}, new double[]{0, 1});
+
+		//	This code is to generate a bigger particle, for simulating brownian motion.
+		// prts[0] = new particle(new double[]{0,0}, new double[]{1,1}, 350, 2, new Color(250, 200, 100));
+
+		for(int k = 0; k < p_num; k++) {
 			Random rand = new Random();
 			double[] pos = new double[2];
 			double[] vel = new double[2];
@@ -224,15 +264,72 @@ public class simulator {
 			vel[1] = ((double) rand.nextInt(10) - 5) / 10;
 			int mass = 10 + rand.nextInt(20) / 2;
 			double radius = Math.sqrt(mass) / 30;
-			prts[k] = new particle(pos, vel, mass, radius, new Color((100 * k) % 255, (150 * k) % 255, (220 * k) % 255));
+			prts[k] = new particle(pos, vel, 15, 0.1, new Color((100 * k) % 255, (150 * k) % 255, (220 * k) % 255));
+
+			boolean col = false;
+			for(int l = 0; l < w_num; l++)
+				if(prts[k].isCollide(wls[l]))
+				{
+					col = true;
+					break;
+				}
+
+			for(int l = 0; l < k; l++)
+				if(prts[k].isCollide(prts[l]))
+				{
+					col = true;
+					break;
+				}
+
+			if(col)
+			{
+				k--;
+				continue;
+			}
 		}
 
-		StdOut.println("\n" + prts[0].toString());
+		/*
+		This code generates particles for diffusion experiment.
 
-		wls[0] = new wall(new double[]{bx_size,0}, new double[]{1,0});
-		wls[1] = new wall(new double[]{0,bx_size}, new double[]{0,1});
-		wls[2] = new wall(new double[]{-bx_size,0}, new double[]{1,0});
-		wls[3] = new wall(new double[]{0,-bx_size}, new double[]{0,1});
+		for(int i = 0; i < 4; i++)
+		{
+			prts[2 * i] = new particle(new double[]{0,9 - (2 * i)}, new double[]{0,0}, 100000000, 0.999999999, Color.BLACK);
+			prts[1 + (2 * i)] = new particle(new double[]{0, -(9 - (2 * i))}, new double[]{0,0}, 100000000, 0.999999999, Color.BLACK);
+		}
+
+		for(int k = 8; k < num; k++) {
+			Random rand = new Random();
+			double[] pos = new double[2];
+			double[] vel = new double[2];
+			pos[1] = ((double) rand.nextInt(200) - 100) / 10;
+			pos[0] = ((double) rand.nextInt(100)) / 10;
+			vel[0] = ((double) rand.nextInt(10) - 5) / 10;
+			vel[1] = ((double) rand.nextInt(10) - 5) / 10;
+			int mass = 10 + rand.nextInt(20) / 2;
+			double radius = Math.sqrt(mass) / 30;
+			prts[k] = new particle(pos, vel, mass, radius, new Color((100 * k) % 255, (150 * k) % 255, (220 * k) % 255));
+
+			boolean col = false;
+			for(int l = 0; l < w_num; l++)
+				if(prts[k].isCollide(wls[l]))
+				{
+					col = true;
+					break;
+				}
+
+			for(int l = 0; l < k; l++)
+				if(prts[k].isCollide(prts[l]))
+				{
+					col = true;
+					break;
+				}
+
+			if(col)
+			{
+				k--;
+				continue;
+			}
+		}*/
 
 		StdDraw.enableDoubleBuffering();
 		StdDraw.setXscale(-11, 11);
@@ -241,15 +338,17 @@ public class simulator {
 
 		simulator sim = new simulator(prts,wls);
 
+		long i = 0;
 		while(true)
 		{
 			StdDraw.clear();
 			sim.draw();
 			StdDraw.show();
-			sim.proceed(0.5);
-			StdDraw.pause(20);
+			sim.proceed(0.1);
+			StdDraw.pause(0);
 			while(!StdDraw.isMousePressed())
 				StdDraw.pause(0);
+			i++;
 		}
 	}
 }
