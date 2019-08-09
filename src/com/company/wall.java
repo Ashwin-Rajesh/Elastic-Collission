@@ -4,8 +4,8 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class wall {
-	public final static double x_scale  = 10;
-	public final static double y_scale = 10;
+	public static double x_scale  = 10;
+	public static double y_scale = 10;
 
 	private final double[] point;
 	private final double[] normal;
