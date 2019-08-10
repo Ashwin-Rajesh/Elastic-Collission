@@ -1,5 +1,3 @@
-//	This class creates n random particles, and simulates their collision in a 2D square box.
-
 package com.company;
 
 import edu.princeton.cs.algs4.StdDraw;
@@ -7,26 +5,12 @@ import edu.princeton.cs.algs4.StdDraw;
 import java.awt.*;
 import java.util.Random;
 
-public class smp_random {
+public class smp_diffusion {
 	public static void main(String[] args)
 	{
-		int pt_num;					// Number of particles simulated
+		int pt_num = 200;			// Number of particles simulated
 		int wl_num = 4;				// Number of walls simulated
-		int bx_sz;					// Defines size of box
-
-		if(args.length > 0)
-		{
-			pt_num = Integer.parseInt(args[0]);
-			if(args.length > 1)
-				bx_sz = Integer.parseInt(args[1]);
-			else
-				bx_sz = 20;
-		}
-		else
-		{
-			pt_num = 100;
-			bx_sz = 20;
-		}
+		int bx_sz = 20;				// Defines size of box
 
 		wall[] wls 		= new wall[wl_num];
 		particle[] pts 	= new particle[pt_num];
@@ -37,20 +21,26 @@ public class smp_random {
 		wls[2] = new wall(new double[]{ bx_sz / 2, 0}, new double[]{1, 0});
 		wls[3] = new wall(new double[]{-bx_sz / 2, 0}, new double[]{1, 0});
 
-		for (int i = 0; i < pt_num; i++)
+		for(int i = 0; i < 4; i++)
+		{
+			pts[2 * i] = new particle(new double[]{0,9 - (2 * i)}, new double[]{0,0}, 1000000000, 0.999999999, Color.BLACK);
+			pts[1 + (2 * i)] = new particle(new double[]{0, -(9 - (2 * i))}, new double[]{0,0}, 1000000000, 0.999999999, Color.BLACK);
+		}
+
+		for (int i = 8; i < pt_num; i++)
 		{
 			double[] pos = new double[2];
 			double[] vel = new double[2];
-			for (int j = 0; j < 2; j++)
-			{
-				pos[j] = (double) (random.nextInt(bx_sz * 10) - bx_sz * 10 / 2) / 10;
-				//vel[j] = (double) (random.nextInt(bx_sz / 2) - (bx_sz / 4)) / 10;
-				vel[j] = pos[j] / 100;
-			}
+
+			pos[0] = (double) (random.nextInt(bx_sz * 5)) / 10;
+			vel[0] = (double) (random.nextInt(bx_sz / 2) - (bx_sz / 4)) / 10;
+			pos[1] = (double) (random.nextInt(bx_sz * 10) - bx_sz * 10 / 2) / 10;
+			vel[1] = (double) (random.nextInt(bx_sz / 2) - (bx_sz / 4)) / 10;
+
 
 			double mass   = 15 + ((double)random.nextInt(10) / 2);
 			double radius = Math.sqrt(mass) / 30;
-			Color color   = new Color((100 * i) % 255, (150 * i) % 255, (220 * i) % 255);
+			Color color   = pos[1] > 0 ? new Color(0,128,255) : new Color(255, 128,0);
 
 			pts[i] = new particle(pos, vel, mass, radius, color);
 
@@ -89,7 +79,7 @@ public class smp_random {
 			StdDraw.clear();
 			sim.draw();
 			StdDraw.show();
-			sim.proceed(1);
+			sim.proceed(0.5);
 			StdDraw.pause(0);
 			while(!StdDraw.isMousePressed())
 				StdDraw.pause(0);
