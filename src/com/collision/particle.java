@@ -1,9 +1,9 @@
-package com.company;
+package com.collision;
 
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class particle {
 	private double[] pos;				// Stores position(x, y components in array) of particle
@@ -34,15 +34,15 @@ public class particle {
 		if(this == obj)								return true;
 		if(this.getClass() != obj.getClass())		return false;
 		particle that = (particle) obj;
-		if(pos.equals(that.pos))
-			if(vel.equals(that.vel))
+		if(Arrays.equals(pos, that.pos))
+			if(Arrays.equals(pos, that.vel))
 				if(mass == that.mass)
 					if(radius == that.radius)
 						return true;
 		return false;
 	}
 
-	public void collide(particle that)
+	void collide(particle that)
 	{
 		/*for(int i = 0; i < vel.length; i++)
 			StdOut.println(this.vel[i] + " , " +  that.vel[i]);
@@ -88,7 +88,7 @@ public class particle {
 		StdOut.println(" collision processed.");*/
 	}
 
-	public void collide(wall that)
+	void collide(wall that)
 	{
 		double[] normal = that.getNormal();
 		int dimension = pos.length;
@@ -113,7 +113,7 @@ public class particle {
 			this.move(0.01);*/
 	}
 
-	public void move(double dt)
+	void move(double dt)
 	{
 		for(int i = 0; i < pos.length; i++)
 		{
@@ -123,7 +123,7 @@ public class particle {
 		}
 	}
 
-	public void draw()
+	void draw()
 	{
 		if(pos.length > 2)
 			throw new IllegalArgumentException(" Only till 2 dimensions can be drawn as of now.");
@@ -159,7 +159,7 @@ public class particle {
 		return str.toString();
 	}
 
-	public double distanceTo(particle that)
+	double distanceTo(particle that)
 	{
 		double dist = 0;
 		for(int i = 0; i < pos.length; i++)
@@ -170,7 +170,7 @@ public class particle {
 		return Math.abs(dist);
 	}
 
-	public double distanceTo(wall that)
+	double distanceTo(wall that)
 	{
 		double[] normal = that.getNormal();
 		double[] point = that.getPoint();
@@ -179,7 +179,7 @@ public class particle {
 		if(normal.length != dimension)
 			throw new IllegalArgumentException(" The particle and wall have different number of dimensions");
 
-		double dist[] = new double[dimension];
+		double[] dist = new double[dimension];
 
 		for (int i = 0; i < dimension; i++)
 		{
@@ -196,14 +196,14 @@ public class particle {
 		return Math.abs(distance) - radius;
 	}
 
-	public double timeToHit(particle that)
+	double timeToHit(particle that)
 	{
 		if(that.equals(this))
 			return Double.POSITIVE_INFINITY;
 
 		int dimension = pos.length;
-		double dv[] = new double[dimension];
-		double dx[] = new double[dimension];
+		double[] dv = new double[dimension];
+		double[] dx = new double[dimension];
 		double dxdv = 0;
 		double dvdv = 0;
 		double dxdx = 0;
@@ -228,15 +228,15 @@ public class particle {
 		return -(dxdv + Math.sqrt(d))/dvdv;
 	}
 
-	public double timeToHit(wall that)
+	double timeToHit(wall that)
 	{
 		if(that.getNormal().length != pos.length)
 			throw new IllegalArgumentException(" The wall and point have different number of dimensions.");
 
-		double normal[] = that.getNormal();
+		double[] normal = that.getNormal();
 		double veldot = 0;
 		int dimensions = pos.length;
-		double point[] = that.getPoint();
+		double[] point = that.getPoint();
 		double disdot = 0;
 
 		for(int i = 0; i < dimensions; i++)
@@ -268,7 +268,7 @@ public class particle {
 		return false;
 	}
 
-	public int getCount()
+	int getCount()
 	{
 		return colCount;
 	}

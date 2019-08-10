@@ -1,7 +1,10 @@
 //	This class creates n random particles, and simulates their collision in a 2D square box.
 
-package com.company;
+package com.samples;
 
+import com.collision.particle;
+import com.collision.simulator;
+import com.collision.wall;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.*;
@@ -71,15 +74,12 @@ public class smp_random {
 				}
 
 			if(col)
-			{
 				i--;
-				continue;
-			}
 		}
 
 		StdDraw.enableDoubleBuffering();
-		StdDraw.setXscale(-(bx_sz * 11 / 20), (bx_sz * 11 / 20));
-		StdDraw.setYscale(-(bx_sz * 11 / 20), (bx_sz * 11 / 20));
+		StdDraw.setXscale(-((double) bx_sz * 11 / 20), ((double) bx_sz * 11 / 20));
+		StdDraw.setYscale(-((double) bx_sz * 11 / 20), ((double) bx_sz * 11 / 20));
 		StdDraw.setPenRadius(0.01);
 
 		simulator sim = new simulator(pts,wls);

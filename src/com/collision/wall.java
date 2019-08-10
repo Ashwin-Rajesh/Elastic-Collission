@@ -1,7 +1,6 @@
-package com.company;
+package com.collision;
 
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
 
 public class wall {
 	public static double x_scale  = 10;
@@ -28,17 +27,17 @@ public class wall {
 			this.normal[i] /= magnitude;
 	}
 
-	public double[] getPoint()
+	double[] getPoint()
 	{
 		return point.clone();
 	}
 
-	public double[] getNormal()
+	double[] getNormal()
 	{
 		return normal.clone();
 	}
 
-	public void draw() {
+	void draw() {
 		if (point.length > 2)
 			throw new IllegalArgumentException(" Drawing supported only for upto 2 dimensions as of now.");
 

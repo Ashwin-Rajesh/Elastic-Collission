@@ -1,5 +1,8 @@
-package com.company;
+package com.samples;
 
+import com.collision.particle;
+import com.collision.simulator;
+import com.collision.wall;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.*;

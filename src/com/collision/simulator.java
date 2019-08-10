@@ -1,8 +1,7 @@
-package com.company;
+package com.collision;
 
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.awt.Color;
@@ -14,7 +13,7 @@ public class simulator {
 	private MinPQ<collision> cols;				// This data structure stores data of all collisions, sorted based on time
 	private double time;						// Stores time elapsed since start of simulation
 	private double nextTime;
-	public int num;
+
 												// This class is used to store data of collisions.
 	private class collision implements Comparable<collision>
 	{
@@ -26,7 +25,7 @@ public class simulator {
 		private final double timeTo;			// Stores time to collision from beginning of simulation
 
 												// isWall is true when a wall, and particle collide, else false
-		public collision(int a, int b, boolean isWall, double currTime)
+		collision(int a, int b, boolean isWall, double currTime)
 		{
 			this.a = a;
 			this.acol = balls[a].getCount();
@@ -58,7 +57,7 @@ public class simulator {
 		}
 
 												// Compares value of collision count during prediction and during access to check if a collision happened in between
-		public boolean isValid()
+		boolean isValid()
 		{
 			if(b == -1)
 			{
@@ -77,7 +76,7 @@ public class simulator {
 		}
 
 												// Calls the collide() function of one particle.
-		public void collide()
+		void collide()
 		{
 			if(b == -1) {
 				balls[a].collide(walls[w]);
@@ -153,7 +152,6 @@ public class simulator {
 			time = nextTime;
 			move(new_dt);
 
-			num++;
 			currCol.collide();
 
 			for(int i = 0; i < balls.length; i++)
@@ -243,8 +241,8 @@ public class simulator {
 		int w_num = 4;
 		int bx_size = 10;
 
-		particle prts[] = new particle[p_num];
-		wall wls[] = new wall[w_num];
+		particle[] prts = new particle[p_num];
+		wall[] wls 		= new wall[w_num];
 
 		wls[0] = new wall(new double[]{bx_size, 0}, new double[]{1, 0});
 		wls[1] = new wall(new double[]{0, bx_size}, new double[]{0, 1});

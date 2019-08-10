@@ -1,53 +1,20 @@
-package com.company;
+package com.samples;
 
+import com.collision.particle;
+import com.collision.simulator;
+import com.collision.wall;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.*;
 import java.util.Random;
 
 public class smp_brownian {
-	public static void main(String  args[])
+	public static void main(String[]  args)
 	{
-		int pt_num;					// Total number of particles simulated
-		int bw_num;					// Number of bigger particles simulated
+		int pt_num = 100;			// Total number of particles simulated
+		int bw_num = 2;				// Number of bigger particles simulated
 		int wl_num = 4;				// Number of walls simulated
-		int bx_sz;					// Defines size of box
-
-		if(args.length > 0)
-		{
-			pt_num = Integer.parseInt(args[0]);
-			if(args.length > 1)
-			{
-				bw_num = Integer.parseInt(args[1]);
-				if(bw_num < 0)
-				{
-					bw_num = pt_num / 100;
-					if(bw_num == 0)
-						bw_num = 1;
-					bx_sz = 20;
-				}
-				if(args.length > 2)
-					bx_sz = Integer.parseInt(args[2]);
-				else
-					bx_sz = 20;
-			}
-			else
-			{
-				bw_num = pt_num / 100;
-				if(bw_num == 0)
-					bw_num = 1;
-				bx_sz = 20;
-			}
-		}
-		else
-		{
-			pt_num = 100;
-			bw_num = 2;
-			bx_sz = 20;
-		}
-
-		if(pt_num < 0 || bw_num < 0 || bx_sz < 0)
-			throw new IllegalArgumentException();
+		int bx_sz = 20;				// Defines size of box
 
 		wall[] wls 		= new wall[wl_num];
 		particle[] pts 	= new particle[pt_num];
@@ -91,10 +58,7 @@ public class smp_brownian {
 				}
 
 			if(col)
-			{
 				i--;
-				continue;
-			}
 		}
 
 		for (int i = bw_num; i < pt_num; i++)
@@ -130,15 +94,12 @@ public class smp_brownian {
 				}
 
 			if(col)
-			{
 				i--;
-				continue;
-			}
 		}
 
 		StdDraw.enableDoubleBuffering();
-		StdDraw.setXscale(-(bx_sz * 11 / 20), (bx_sz * 11 / 20));
-		StdDraw.setYscale(-(bx_sz * 11 / 20), (bx_sz * 11 / 20));
+		StdDraw.setXscale(-((double) bx_sz * 11 / 20), ((double) bx_sz * 11 / 20));
+		StdDraw.setYscale(-((double) bx_sz * 11 / 20), ((double) bx_sz * 11 / 20));
 		StdDraw.setPenRadius(0.01);
 		wall.x_scale = bx_sz / 2;
 		wall.y_scale = bx_sz / 2;
